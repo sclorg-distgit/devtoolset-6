@@ -9,7 +9,7 @@
 Summary: Package that installs %scl
 Name: %scl_name
 Version: 6.0
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -65,7 +65,7 @@ Requires: %{scl_prefix}runtime
 Requires: %{scl_prefix}gcc %{scl_prefix}gcc-c++ %{scl_prefix}gcc-gfortran
 Requires: %{scl_prefix}binutils %{scl_prefix}gdb %{scl_prefix}strace
 Requires: %{scl_prefix}dwz %{scl_prefix}elfutils %{scl_prefix}memstomp
-Requires: %{scl_prefix}ltrace
+Requires: %{scl_prefix}ltrace %{scl_prefix}make
 Obsoletes: %{name}-toolchain < %{version}-%{release}
 
 %description toolchain
@@ -234,6 +234,9 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Thu Aug 04 2016 Marek Polacek <polacek@redhat.com> - 6.0-5
+- require DTS make (#1363950)
+
 * Tue Aug 02 2016 Marek Polacek <polacek@redhat.com> - 6.0-4
 - change DTS dockerfiles to match those used to build docker registry images (#1362204)
 
