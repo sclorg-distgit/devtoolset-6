@@ -7,7 +7,7 @@
 Summary: Package that installs %scl
 Name: %scl_name
 Version: 6.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -15,7 +15,7 @@ Source0: https://github.com/sclorg/rhscl-dockerfiles/archive/%{dfcommit}/rhscl-d
 Source1: README
 
 # The base package must require everything in the collection
-Requires: %{scl_prefix}toolchain %{scl_prefix}ide %{scl_prefix}perftools
+Requires: %{scl_prefix}toolchain %{scl_prefix}perftools
 Obsoletes: %{name} < %{version}-%{release}
 
 BuildRequires: scl-utils-build >= 20120927-11
@@ -43,12 +43,6 @@ Group: Applications/File
 Requires: %{scl_prefix}runtime
 Requires: scl-utils-build >= 20120927-11
 Obsoletes: %{name}-build < %{version}-%{release}
-# Java stuff has build-time requirements on these SCLs,
-# which are only available for x86_64 arch
-%ifarch x86_64
-Requires: rh-java-common-scldevel >= 1.1-12
-Requires: maven30-scldevel >= 1.1-7
-%endif
 
 %description build
 Package shipping essential configuration macros to build %scl Software Collection.
@@ -65,71 +59,6 @@ Obsoletes: %{name}-toolchain < %{version}-%{release}
 
 %description toolchain
 Package shipping basic toolchain applications (compiler, debugger, ...)
-
-%package ide
-Summary: Package shipping Eclipse IDE
-Group: Applications/File
-Requires: %{scl_prefix}runtime
-Requires: %{scl_prefix}eclipse-cdt
-Requires: %{scl_prefix}eclipse-cdt-docker
-Requires: %{scl_prefix}eclipse-cdt-parsers
-Requires: %{scl_prefix}eclipse-changelog
-Requires: %{scl_prefix}eclipse-dltk
-Requires: %{scl_prefix}eclipse-dltk-mylyn
-Requires: %{scl_prefix}eclipse-dltk-rse
-Requires: %{scl_prefix}eclipse-dltk-ruby
-Requires: %{scl_prefix}eclipse-dltk-sh
-Requires: %{scl_prefix}eclipse-dltk-tcl
-Requires: %{scl_prefix}eclipse-egit
-Requires: %{scl_prefix}eclipse-egit-mylyn
-Requires: %{scl_prefix}eclipse-emf-runtime
-Requires: %{scl_prefix}eclipse-gcov
-Requires: %{scl_prefix}eclipse-gef
-Requires: %{scl_prefix}eclipse-gprof
-Requires: %{scl_prefix}eclipse-jdt
-Requires: %{scl_prefix}eclipse-jgit
-Requires: %{scl_prefix}eclipse-linuxtools
-Requires: %{scl_prefix}eclipse-linuxtools-docker
-Requires: %{scl_prefix}eclipse-linuxtools-javadocs
-Requires: %{scl_prefix}eclipse-linuxtools-libhover
-Requires: %{scl_prefix}eclipse-linuxtools-vagrant
-Requires: %{scl_prefix}eclipse-manpage
-Requires: %{scl_prefix}eclipse-mylyn
-Requires: %{scl_prefix}eclipse-mylyn-builds
-Requires: %{scl_prefix}eclipse-mylyn-builds-hudson
-Requires: %{scl_prefix}eclipse-mylyn-context-cdt
-Requires: %{scl_prefix}eclipse-mylyn-context-java
-Requires: %{scl_prefix}eclipse-mylyn-context-pde
-Requires: %{scl_prefix}eclipse-mylyn-docs-epub
-Requires: %{scl_prefix}eclipse-mylyn-docs-wikitext
-Requires: %{scl_prefix}eclipse-mylyn-tasks-bugzilla
-Requires: %{scl_prefix}eclipse-mylyn-tasks-trac
-Requires: %{scl_prefix}eclipse-mylyn-tasks-web
-Requires: %{scl_prefix}eclipse-mylyn-versions
-Requires: %{scl_prefix}eclipse-mylyn-versions-cvs
-Requires: %{scl_prefix}eclipse-mylyn-versions-git
-Requires: %{scl_prefix}eclipse-oprofile
-Requires: %{scl_prefix}eclipse-p2-discovery
-Requires: %{scl_prefix}eclipse-pde
-Requires: %{scl_prefix}eclipse-perf
-Requires: %{scl_prefix}eclipse-platform
-Requires: %{scl_prefix}eclipse-ptp
-Requires: %{scl_prefix}eclipse-ptp-rm-contrib
-Requires: %{scl_prefix}eclipse-ptp-sci
-Requires: %{scl_prefix}eclipse-ptp-sdm
-Requires: %{scl_prefix}eclipse-pydev
-Requires: %{scl_prefix}eclipse-pydev-mylyn
-Requires: %{scl_prefix}eclipse-remote
-Requires: %{scl_prefix}eclipse-rpm-editor
-Requires: %{scl_prefix}eclipse-rse
-Requires: %{scl_prefix}eclipse-rse-server
-Requires: %{scl_prefix}eclipse-systemtap
-Requires: %{scl_prefix}eclipse-tm-terminal
-Requires: %{scl_prefix}eclipse-valgrind
-Obsoletes: %{name}-ide < %{version}-%{release}
-
-%description ide
-Package shipping Eclipse IDE
 
 %package perftools
 Summary: Package shipping performance tools
@@ -181,24 +110,10 @@ help2man -N --section 7 ./h2m_helper -o %{?scl_name}.7
 # Enable collection script
 # ========================
 cat <<EOF >enable
-# The IDE part of this collection has a runtime dependency on
-# the java-common collection, so enable it if present
-if test -e /opt/rh/rh-java-common/enable ; then
-  . scl_source enable rh-java-common
-fi
-
 # General environment variables
 export PATH=%{_bindir}\${PATH:+:\${PATH}}
 export MANPATH=%{_mandir}:\${MANPATH}
 export INFOPATH=%{_infodir}\${INFOPATH:+:\${INFOPATH}}
-
-# Needed by Java Packages Tools to locate java.conf
-export JAVACONFDIRS="%{_sysconfdir}/java:\${JAVACONFDIRS:-/etc/java}"
-
-# Required by XMvn to locate its configuration files
-export XDG_CONFIG_DIRS="%{_sysconfdir}/xdg:\${XDG_CONFIG_DIRS:-/etc/xdg}"
-export XDG_DATA_DIRS="%{_datadir}:\${XDG_DATA_DIRS:+\${XDG_DATADIRS}:}/usr/local/share:/usr/share"
-
 export PCP_DIR=%{_scl_root}
 # Some perl Ext::MakeMaker versions install things under /usr/lib/perl5
 # even though the system otherwise would go to /usr/lib64/perl5.
@@ -237,130 +152,6 @@ EOF
 
 # " (Fix vim syntax coloring.)
 
-# Java configuration
-# ==================
-cat <<EOF >java.conf
-JAVA_LIBDIR=%{_datadir}/java
-JNI_LIBDIR=%{_prefix}/lib/java
-JVM_ROOT=%{_prefix}/lib/jvm
-EOF
-
-# Ivy configuration
-# =================
-cat <<EOF >ivysettings.xml
-<!-- Ivy configuration file for %{scl} software collection
-     Artifact resolution order is:
-      1. %{scl} collection
-      2. java-common collection
-      3. maven30 collection
-      4. base operating system
--->
-<ivysettings>
-  <settings defaultResolver="default"/>
-  <resolvers>
-    <filesystem name="%{scl}-public">
-      <ivy pattern="\${ivy.conf.dir}/lib/[module]/apache-ivy-[revision].xml" />
-      <artifact pattern="%{_datadir}/java/\[artifact].[ext]" />
-    </filesystem>
-    <filesystem name="java-common-public">
-      <ivy pattern="\${ivy.conf.dir}/lib/[module]/apache-ivy-[revision].xml" />
-      <artifact pattern="/opt/rh/rh-java-common/root/%{_root_datadir}/java/\[artifact].[ext]" />
-    </filesystem>
-    <filesystem name="maven30-public">
-      <ivy pattern="\${ivy.conf.dir}/lib/[module]/apache-ivy-[revision].xml" />
-      <artifact pattern="/opt/rh/maven30/root/%{_root_datadir}/java/\[artifact].[ext]" />
-    </filesystem>
-    <filesystem name="public">
-      <ivy pattern="\${ivy.conf.dir}/lib/[module]/apache-ivy-[revision].xml" />
-      <artifact pattern="%{_root_datadir}/java/\[artifact].[ext]" />
-    </filesystem>
-    <chain name="main" dual="true">
-      <resolver ref="%{scl}-public"/>
-      <resolver ref="java-common-public"/>
-      <resolver ref="maven30-public"/>
-      <resolver ref="public"/>
-    </chain>
-  </resolvers>
-  <include url="\${ivy.default.settings.dir}/ivysettings-local.xml"/>
-  <include url="\${ivy.default.settings.dir}/ivysettings-default-chain.xml"/>
-</ivysettings>
-EOF
-
-# XMvn configuration
-# =================
-cat <<EOF >configuration.xml
-<?xml version="1.0" encoding="US-ASCII"?>
-<!-- XMvn configuration file for %{scl} software collection
-     Artifact resolution order is:
-      1. %{scl} collection
-      2. java-common collection
-      3. maven30 collection
-      4. base operating system
--->
-<configuration xmlns="http://fedorahosted.org/xmvn/CONFIG/2.0.0">
-  <resolverSettings>
-    <prefixes>
-      <prefix>%{_scl_root}</prefix>
-      <prefix>/</prefix>
-    </prefixes>
-    <metadataRepositories>
-      <repository>%{_scl_root}/usr/share/maven-metadata</repository>
-    </metadataRepositories>
-  </resolverSettings>
-  <installerSettings>
-    <metadataDir>opt/rh/%{scl}/root/usr/share/maven-metadata</metadataDir>
-  </installerSettings>
-  <repositories>
-    <repository>
-      <id>resolve-%{scl}</id>
-      <type>compound</type>
-      <properties>
-        <prefix>%{_scl_root}</prefix>
-        <namespace>%{scl}</namespace>
-      </properties>
-      <configuration>
-        <repositories>
-          <repository>base-resolve</repository>
-        </repositories>
-      </configuration>
-    </repository>
-    <repository>
-      <id>resolve</id>
-      <type>compound</type>
-      <properties>
-        <prefix>/</prefix>
-      </properties>
-      <configuration>
-        <repositories>
-	  <!-- Put resolvers in order you want to use them, from
-	       highest to lowest preference. (resolve-local is
-	       resolver that resolves from local Maven repository in
-	       .xm2 in current directory.) -->
-          <repository>resolve-local</repository>
-          <repository>resolve-%{scl}</repository>
-          <repository>resolve-java-common</repository>
-          <repository>resolve-maven30</repository>
-          <repository>base-resolve</repository>
-        </repositories>
-      </configuration>
-    </repository>
-    <repository>
-      <id>install</id>
-      <type>compound</type>
-      <properties>
-        <prefix>opt/rh/%{scl}/root</prefix>
-        <namespace>%{scl}</namespace>
-      </properties>
-      <configuration>
-        <repositories>
-          <repository>base-install</repository>
-        </repositories>
-      </configuration>
-    </repository>
-  </repositories>
-</configuration>
-EOF
-
 %install
 (%{scl_install})
 
@@ -372,29 +163,12 @@ install -p -m 755 enable %{buildroot}%{_scl_scripts}/
 install -d -m 755 %{buildroot}%{_scl_scripts}
 install -p -m 755 sudo %{buildroot}%{_bindir}/
 
-install -d -m 755 %{buildroot}%{_sysconfdir}/java
-install -d -m 755 %{buildroot}%{_sysconfdir}/java/security
-install -d -m 755 %{buildroot}%{_sysconfdir}/java/security/security.d
-install -p -m 644 java.conf %{buildroot}%{_sysconfdir}/java/
-
-install -d -m 755 %{buildroot}%{_sysconfdir}/ivy
-install -p -m 644 ivysettings.xml %{buildroot}%{_sysconfdir}/ivy/
-
-install -d -m 755 %{buildroot}%{_sysconfdir}/xdg/xmvn
-install -p -m 644 configuration.xml %{buildroot}%{_sysconfdir}/xdg/xmvn/
-
 # Other directories that should be owned by the runtime
 install -d -m 755 %{buildroot}%{_datadir}/appdata
-# Native java bits are always in /usr/lib even on 64bit arches
-install -d -m 755 %{buildroot}%{_scl_root}/usr/lib/java
-# Otherwise unowned maven directories
-install -d -m 755 %{buildroot}%{_datadir}/maven-metadata
-install -d -m 755 %{buildroot}%{_datadir}/maven-poms
 # Otherwise unowned perl directories
 install -d -m 755 %{buildroot}%{_libdir}/perl5
 install -d -m 755 %{buildroot}%{_libdir}/perl5/vendor_perl
 install -d -m 755 %{buildroot}%{_libdir}/perl5/vendor_perl/auto
-
 
 %if 0%{?rhel} >= 7
 install -d %{buildroot}%{dockerfiledir}
@@ -424,20 +198,13 @@ install -p -m 644 %{?scl_name}.7 %{buildroot}%{_mandir}/man7/
 %files runtime
 %scl_files
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) %{_sysconfdir}/selinux-equiv.created
-%{_sysconfdir}/ivy
-%{_sysconfdir}/java
 %dir %{_scl_root}/etc/alternatives
 %dir %{_datadir}/appdata
-%dir %{_scl_root}/usr/lib/java
-%dir %{_datadir}/maven-metadata
-%dir %{_datadir}/maven-poms
 
 %files build
 %{_root_sysconfdir}/rpm/macros.%{scl}*
 
 %files toolchain
-
-%files ide
 
 %files perftools
 
@@ -463,6 +230,9 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Mon Aug 01 2016 Marek Polacek <polacek@redhat.com> - 6.0-3
+- remove the -ide subpackage and related Eclipse stuff (#1359078)
+
 * Mon Aug 01 2016 Marek Polacek <polacek@redhat.com> - 6.0-2
 - only require dyninst on ppc64 and x86_64 (#1361769)
 
