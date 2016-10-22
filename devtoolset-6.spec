@@ -7,7 +7,7 @@
 Summary: Package that installs %scl
 Name: %scl_name
 Version: 6.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -136,7 +136,9 @@ Summary: Package shipping performance tools
 Group: Applications/File
 Requires: %{scl_prefix}runtime
 Requires: %{scl_prefix}oprofile %{scl_prefix}systemtap %{scl_prefix}valgrind
+%ifarch x86_64 ppc64
 Requires: %{scl_prefix}dyninst
+%endif
 Obsoletes: %{name}-perftools < %{version}-%{release}
 
 %description perftools
@@ -461,6 +463,9 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Mon Aug 01 2016 Marek Polacek <polacek@redhat.com> - 6.0-2
+- only require dyninst on ppc64 and x86_64 (#1361769)
+
 * Thu Jul 21 2016 Marek Polacek <polacek@redhat.com> - 6.0-1
 - bump to build for ppc64be, too
 
