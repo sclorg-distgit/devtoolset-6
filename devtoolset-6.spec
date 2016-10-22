@@ -1,18 +1,29 @@
 %global scl devtoolset-6
 %scl_package %scl
-%global dfcommit 51560a33b6e3e429b807bcb3e4423415c43b5bb5
-%global dfshortcommit %(c=%{dfcommit}; echo ${c:0:7})
+%global df_toolchain cea31975b74ba49da00f796d2d531c0475c3f111
+%global df_perftools 703825c5664cbc28579ad04b2ca664e04570d545
+%global df_toolchain_s %(c=%{df_toolchain}; echo ${c:0:7})
+%global df_perftools_s %(c=%{df_perftools}; echo ${c:0:7})
 %global dockerfiledir %{_datadir}/%{scl_prefix}dockerfiles
 
 Summary: Package that installs %scl
 Name: %scl_name
 Version: 6.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Source0: https://github.com/sclorg/rhscl-dockerfiles/archive/%{dfcommit}/rhscl-dockerfiles-%{dfshortcommit}.tar.gz
-Source1: README
+Source0: README
+# The source for this package was pulled from upstream's git.  Use the
+# following commands to generate the tarball:
+# git clone git://pkgs.devel.redhat.com/rpms/devtoolset-4-toolchain-docker -b devtoolset-6.0-rhel-7 devtoolset-6-toolchain-docker
+# rm -rf devtoolset-6-toolchain-docker/.git{,ignore}
+# tar cf - devtoolset-6-toolchain-docker | bzip2 -9 > devtoolset-6-toolchain-docker-%{df_toolchain_s}.tar.bz2
+# git clone git://pkgs.devel.redhat.com/rpms/devtoolset-4-perftools-docker -b devtoolset-6.0-rhel-7 devtoolset-6-perftools-docker
+# rm -rf devtoolset-6-perftools-docker/.git{,ignore}
+# tar cf - devtoolset-6-perftools-docker | bzip2 -9 > devtoolset-6-perftools-docker-%{df_perftools_s}.tar.bz2
+Source1: %{scl_prefix}toolchain-docker-%{df_toolchain_s}.tar.bz2
+Source2: %{scl_prefix}perftools-docker-%{df_perftools_s}.tar.bz2
 
 # The base package must require everything in the collection
 Requires: %{scl_prefix}toolchain %{scl_prefix}perftools
@@ -84,12 +95,12 @@ with Red Hat Developer Toolset.  Use these examples to stand up
 test environments using the Docker container engine.
 
 %prep
-%setup -c
+%setup -c -T -a 1 -a 2
 
 # This section generates README file from a template and creates man page
 # from that file, expanding RPM macros in the template file.
 cat <<'EOF' | tee README
-%{expand:%(cat %{SOURCE1})}
+%{expand:%(cat %{SOURCE0})}
 EOF
 
 %build
@@ -172,19 +183,12 @@ install -d -m 755 %{buildroot}%{_libdir}/perl5/vendor_perl/auto
 
 %if 0%{?rhel} >= 7
 install -d %{buildroot}%{dockerfiledir}
-
-collections="devtoolset-4 devtoolset-4-toolchain devtoolset-4-dyninst \
-             devtoolset-4-elfutils devtoolset-4-oprofile devtoolset-4-systemtap \
-             devtoolset-4-valgrind"
-install -d -p -m 755 %{buildroot}%{dockerfiledir}/rhel{6,7}
+install -d -p -m 755 %{buildroot}%{dockerfiledir}/rhel7
+collections="devtoolset-6-toolchain-docker devtoolset-6-perftools-docker"
 for d in $collections; do
-  install -d -p -m 755 %{buildroot}%{dockerfiledir}/rhel{6,7}/$d
-  cp -a rhscl-dockerfiles-%{dfcommit}/rhel7.$d/* %{buildroot}%{dockerfiledir}/rhel7/$d
-  cp -a rhscl-dockerfiles-%{dfcommit}/rhel6.$d/* %{buildroot}%{dockerfiledir}/rhel6/$d
+  install -d -p -m 755 %{buildroot}%{dockerfiledir}/rhel7/$d
+  cp -a $d %{buildroot}%{dockerfiledir}/rhel7
 done
-
-# BZ#1194557: Don't ship systemtap container for RHEL6.
-rm -rf %{buildroot}%{dockerfiledir}/rhel6/devtoolset-4-systemtap
 %endif
 
 # Install generated man page.
@@ -230,6 +234,9 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Tue Aug 02 2016 Marek Polacek <polacek@redhat.com> - 6.0-4
+- change DTS dockerfiles to match those used to build docker registry images (#1362204)
+
 * Mon Aug 01 2016 Marek Polacek <polacek@redhat.com> - 6.0-3
 - remove the -ide subpackage and related Eclipse stuff (#1359078)
 
