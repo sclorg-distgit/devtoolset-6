@@ -7,7 +7,7 @@
 Summary: Package that installs %scl
 Name: %scl_name
 Version: 6.0
-Release: 0%{?dist}
+Release: 1%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -461,5 +461,8 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Thu Jul 21 2016 Marek Polacek <polacek@redhat.com> - 6.0-1
+- bump to build for ppc64be, too
+
 * Mon Jul 18 2016 Marek Polacek <polacek@redhat.com> - 6.0-0
 - initial version, with old dockerfiles (#1356527)
