@@ -1,7 +1,7 @@
 %global scl devtoolset-6
 %scl_package %scl
-%global df_toolchain cea31975b74ba49da00f796d2d531c0475c3f111
-%global df_perftools 703825c5664cbc28579ad04b2ca664e04570d545
+%global df_toolchain d0e8f8ad24f38c3ad19cfb47cf1ba488a93de60d
+%global df_perftools df416ac0951d00c1a35ef19bbef6d2f4af7c5883
 %global df_toolchain_s %(c=%{df_toolchain}; echo ${c:0:7})
 %global df_perftools_s %(c=%{df_perftools}; echo ${c:0:7})
 %global dockerfiledir %{_datadir}/%{scl_prefix}dockerfiles
@@ -9,17 +9,17 @@
 Summary: Package that installs %scl
 Name: %scl_name
 Version: 6.0
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Source0: README
 # The source for this package was pulled from upstream's git.  Use the
 # following commands to generate the tarball:
-# git clone git://pkgs.devel.redhat.com/rpms/devtoolset-4-toolchain-docker -b devtoolset-6.0-rhel-7 devtoolset-6-toolchain-docker
+# git clone git://pkgs.devel.redhat.com/rpms/devtoolset-6-toolchain-docker -b devtoolset-6.0-rhel-7
 # rm -rf devtoolset-6-toolchain-docker/.git{,ignore}
 # tar cf - devtoolset-6-toolchain-docker | bzip2 -9 > devtoolset-6-toolchain-docker-%{df_toolchain_s}.tar.bz2
-# git clone git://pkgs.devel.redhat.com/rpms/devtoolset-4-perftools-docker -b devtoolset-6.0-rhel-7 devtoolset-6-perftools-docker
+# git clone git://pkgs.devel.redhat.com/rpms/devtoolset-6-perftools-docker -b devtoolset-6.0-rhel-7
 # rm -rf devtoolset-6-perftools-docker/.git{,ignore}
 # tar cf - devtoolset-6-perftools-docker | bzip2 -9 > devtoolset-6-perftools-docker-%{df_perftools_s}.tar.bz2
 Source1: %{scl_prefix}toolchain-docker-%{df_toolchain_s}.tar.bz2
@@ -234,6 +234,9 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Fri Sep 23 2016 Marek Polacek <polacek@redhat.com> - 6.0-6
+- update dockerfiles (#1367352)
+
 * Thu Aug 04 2016 Marek Polacek <polacek@redhat.com> - 6.0-5
 - require DTS make (#1363950)
 
