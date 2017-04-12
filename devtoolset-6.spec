@@ -8,8 +8,8 @@
 
 Summary: Package that installs %scl
 Name: %scl_name
-Version: 6.0
-Release: 6%{?dist}
+Version: 6.1
+Release: 1%{?dist}
 License: GPLv2+
 Group: Applications/File
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -166,6 +166,11 @@ EOF
 %install
 (%{scl_install})
 
+# This allows users to build packages using DTS.
+cat >> %{buildroot}%{_root_sysconfdir}/rpm/macros.%{scl}-config << EOF
+%%enable_devtoolset6 %%global ___build_pre %%{___build_pre}; source scl_source enable %{scl} || :
+EOF
+
 mkdir -p %{buildroot}%{_scl_root}/etc/alternatives %{buildroot}%{_scl_root}/var/lib/alternatives
 
 install -d -m 755 %{buildroot}%{_scl_scripts}
@@ -234,6 +239,21 @@ if [ $1 = 0 ]; then
 fi
 
 %changelog
+* Wed Jan 25 2017 Marek Polacek <polacek@redhat.com> - 6.1-1
+- update Version
+
+* Tue Jan 17 2017 Marek Polacek <polacek@redhat.com> - 6.0-10
+- bump Release (rebuild for DTS-6.1)
+
+* Tue Nov 29 2016 Marek Polacek <polacek@redhat.com> - 6.0-9
+- ...and remove 'define' from the enable_devtoolset6 macro
+
+* Tue Nov 29 2016 Marek Polacek <polacek@redhat.com> - 6.0-8
+- move the enable_devtoolset6 definition to /etc/rpm/macros.devtoolset-6-config
+
+* Tue Nov 29 2016 Marek Polacek <polacek@redhat.com> - 6.0-7
+- define enable_devtoolset6
+
 * Fri Sep 23 2016 Marek Polacek <polacek@redhat.com> - 6.0-6
 - update dockerfiles (#1367352)
 
